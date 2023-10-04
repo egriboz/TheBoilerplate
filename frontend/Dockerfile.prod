@@ -1,0 +1,33 @@
+# Use an official Node runtime as the base image
+FROM node:18
+
+# Create and set the working directory
+WORKDIR /frontend
+
+# Install dependencies
+# Copy package.json and yarn.lock files to the working directory
+COPY package.json yarn.lock /frontend/
+
+# Set CI environment variable to true to ensure Yarn install runs in CI mode (optional)
+RUN CI=true
+
+# Install project dependencies using Yarn
+RUN yarn
+
+# Copy the current directory contents into the container at /frontend
+COPY . /frontend/
+
+# Set DEBUG environment variable to false
+ENV DEBUG=false
+
+# Build the app
+# This command will build the app for production to the build folder
+RUN yarn build
+
+# Install a production process manager for Node.js
+# pm2 will help in managing and keeping the app alive
+RUN yarn global add pm2
+
+# Start the app with pm2
+# pm2-runtime is a production runtime for PM2 to ensure the app stays alive
+CMD ["pm2-runtime", "start", "yarn --name 'frontend' -- start"]

@@ -1,0 +1,32 @@
+version: '3.1'
+
+networks:
+  mynetwork:
+    driver: bridge
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/backend
+    environment:
+      - DEBUG=True
+    networks:
+      - mynetwork
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/frontend
+      - ./frontend/.next:/frontend/.next
+      - ./frontend:/app
+    networks:
+      - mynetwork
+    tty: true
+    stdin_open: true
